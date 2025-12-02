@@ -2,7 +2,7 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import { ExtractedTicketData } from '../types';
 
-declare const process: any;
+declare var process: any;
 
 const API_KEY = process.env.API_KEY;
 
@@ -51,7 +51,8 @@ export const extractTicketDetailsFromImage = async (
       }
     });
 
-    const jsonString = response.text ? response.text.trim() : "{}";
+    const text = response.text;
+    const jsonString = text ? text.trim() : "{}";
     const parsedData = JSON.parse(jsonString);
 
     // Validate that it fits the expected structure
