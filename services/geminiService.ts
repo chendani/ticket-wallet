@@ -2,6 +2,8 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import { ExtractedTicketData } from '../types';
 
+declare const process: any;
+
 const API_KEY = process.env.API_KEY;
 
 if (!API_KEY) {
