@@ -1,10 +1,7 @@
 
-// Fix: Import React to provide types for function return signature.
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function useLocalStorage<T,>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
-  // Use a ref to track if it's the first render to avoid double initialization effects if not needed,
-  // but simpler here: we need to initialize state based on the CURRENT key.
   
   const readValue = (): T => {
     if (typeof window === 'undefined') {

@@ -2,7 +2,6 @@
 import React from 'react';
 import { Event } from '../types';
 import { BellIcon } from './icons/BellIcon';
-import { XIcon } from './icons/XIcon';
 
 interface ReminderModalProps {
   event: Event | null;
@@ -23,7 +22,7 @@ const ReminderModal: React.FC<ReminderModalProps> = ({ event, onClose }) => {
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4 animate-fade-in"
-      onClick={(e) => e.stopPropagation()} // Prevent closing on backdrop click to ensure they click the button? Or allow it. User said "Click thanks to turn off".
+      onClick={(e) => e.stopPropagation()} 
     >
       <div className="bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-sm border border-purple-500 relative">
         <div className="flex items-center space-x-3 rtl:space-x-reverse mb-4 text-purple-400">

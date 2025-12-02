@@ -1,10 +1,9 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { extractTicketDetailsFromImage } from '../services/geminiService';
 import { ExtractedTicketData, Ticket, NewTicketPayload, Event } from '../types';
 import Loader from './Loader';
 import { UploadIcon } from './icons/UploadIcon';
-import { ArrowRightIcon } from './icons/ArrowRightIcon';
-import { TrashIcon } from './icons/TrashIcon';
 import { XIcon } from './icons/XIcon';
 import ProgressBar from './ProgressBar';
 

@@ -49,7 +49,7 @@ export const extractTicketDetailsFromImage = async (
       }
     });
 
-    const jsonString = response.text.trim();
+    const jsonString = response.text ? response.text.trim() : "{}";
     const parsedData = JSON.parse(jsonString);
 
     // Validate that it fits the expected structure
