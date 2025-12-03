@@ -60,6 +60,7 @@ const suggestCommonName = (name1: string, name2: string): string => {
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(authService.getCurrentUser());
   const [isDataLoading, setIsDataLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   
   // Events state is now just React state, populated from IndexedDB
   const [events, setEvents] = useState<Event[]>([]);
@@ -93,6 +94,7 @@ const App: React.FC = () => {
               return storageService.getUserEvents(user.id);
           }).then(loadedEvents => {
               setEvents(loadedEvents);
+              setIsInitialized(true);
               setIsDataLoading(false);
           }).catch(err => {
               console.error("Failed to load events", err);
@@ -100,17 +102,17 @@ const App: React.FC = () => {
           });
       } else {
           setEvents([]);
+          setIsInitialized(false);
       }
   }, [user]);
 
   // Save Data to IndexedDB whenever events change
   useEffect(() => {
-      if (user && !isDataLoading) {
-          // Debounce could be added here for performance if needed, 
-          // but for now direct save is safer for data integrity.
+      // Only save if the app has finished initial loading to prevent overwriting with empty array on startup
+      if (user && isInitialized) {
           storageService.saveUserEvents(user.id, events).catch(err => console.error("Save failed", err));
       }
-  }, [events, user, isDataLoading]);
+  }, [events, user, isInitialized]);
 
   useEffect(() => {
     if (!user) return;
