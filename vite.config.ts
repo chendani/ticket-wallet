@@ -9,7 +9,21 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, (process as any).cwd(), '');
   
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      {
+        name: 'html-transform',
+        transformIndexHtml(html) {
+          if (mode === 'production') {
+            // Remove Tailwind CDN script (used only for dev preview)
+            html = html.replace(/<script src="https:\/\/cdn\.tailwindcss\.com"><\/script>/, '');
+            // Remove ImportMap script block (used only for dev preview)
+            html = html.replace(/<script type="importmap">[\s\S]*?<\/script>/, '');
+          }
+          return html;
+        },
+      },
+    ],
     define: {
       // This explicitly replaces 'process.env.API_KEY' in your code with the actual string value during build
       'process.env.API_KEY': JSON.stringify((process as any).env.API_KEY || env.API_KEY)
