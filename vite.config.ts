@@ -15,9 +15,10 @@ export default defineConfig(({ mode }) => {
         transformIndexHtml(html) {
           if (mode === 'production') {
             // Remove Tailwind CDN script (used only for dev preview)
-            html = html.replace(/<script src="https:\/\/cdn\.tailwindcss\.com"><\/script>/, '');
+            html = html.replace(/<script\s+src="https:\/\/cdn\.tailwindcss\.com"><\/script>/, '');
+            
             // Remove ImportMap script block (used only for dev preview)
-            html = html.replace(/<script type="importmap">[\s\S]*?<\/script>/, '');
+            html = html.replace(/<script\s+type="importmap">[\s\S]*?<\/script>/, '');
           }
           return html;
         },

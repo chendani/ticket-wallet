@@ -2,15 +2,10 @@
 <html lang="he" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>ארנק כרטיסים דיגיטלי</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#111827">
-
-    <!-- ImportMap MUST be before any module scripts for the preview to work without warnings -->
+    
+    <!-- ImportMap MUST be the very first script to work correctly in local preview -->
     <script type="importmap">
     {
       "imports": {
@@ -23,8 +18,16 @@
       }
     }
     </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#111827">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <!-- Restore Tailwind CDN for Preview Mode -->
+    <!-- Restore Tailwind CDN for Preview Mode (Removed in Production via vite.config.ts) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       body {
@@ -32,7 +35,7 @@
       }
     </style>
     
-    <!-- pdf.js script -->
+    <!-- pdf.js script (Module) must come AFTER importmap -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.min.mjs" type="module"></script>
   </head>
   <body class="bg-gray-900 text-white">

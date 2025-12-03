@@ -1,4 +1,3 @@
-
 {
   "short_name": "ארנק כרטיסים",
   "name": "ארנק כרטיסים דיגיטלי",
@@ -14,8 +13,11 @@
       "sizes": "512x512"
     }
   ],
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "theme_color": "#111827",
-  "background_color": "#111827"
+  "background_color": "#111827",
+  "orientation": "portrait"
 }
