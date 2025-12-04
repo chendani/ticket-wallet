@@ -13,7 +13,7 @@ interface TicketDetailModalProps {
 }
 
 const TicketDetailModal: React.FC<TicketDetailModalProps> = ({ ticket, onClose, onEdit }) => {
-  const [scale, setScale] = useState(1);
+  const [scale, setScale] = useState(0.5); // Start at 50%
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
@@ -25,8 +25,8 @@ const TicketDetailModal: React.FC<TicketDetailModalProps> = ({ ticket, onClose, 
     }
   }, [scale]);
 
-  const handleZoomIn = () => setScale(prev => Math.min(3, prev + 0.2));
-  const handleZoomOut = () => setScale(prev => Math.max(0.5, prev - 0.2));
+  const handleZoomIn = () => setScale(prev => Math.min(2.0, prev + 0.1)); // Max 200%
+  const handleZoomOut = () => setScale(prev => Math.max(0.1, prev - 0.1)); // Min 10%
   
   // Mouse Handlers
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -132,11 +132,11 @@ const TicketDetailModal: React.FC<TicketDetailModalProps> = ({ ticket, onClose, 
         {/* Controls panel at the bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent flex flex-col items-center space-y-2">
             <div className="flex justify-center items-center space-x-6">
-                <button onClick={handleZoomOut} className="bg-gray-700/80 p-3 rounded-full text-white hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={scale <= 0.5}>
+                <button onClick={handleZoomOut} className="bg-gray-700/80 p-3 rounded-full text-white hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={scale <= 0.1}>
                     <MinusIcon className="h-6 w-6" /> 
                 </button>
                 <span className="text-white font-mono w-16 text-center text-lg select-none">{(scale * 100).toFixed(0)}%</span>
-                <button onClick={handleZoomIn} className="bg-gray-700/80 p-3 rounded-full text-white hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={scale >= 3.0}>
+                <button onClick={handleZoomIn} className="bg-gray-700/80 p-3 rounded-full text-white hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={scale >= 2.0}>
                     <PlusIcon className="h-6 w-6" />
                 </button>
             </div>

@@ -29,7 +29,7 @@ export const extractTicketDetailsFromImage = async (
   try {
     const imagePart = fileToGenerativePart(imageBase64, mimeType);
     const textPart = {
-      text: "Analyze this event ticket image and extract the following details. The ticket might be in Hebrew. Pay close attention to dates. Interpret two-digit years (e.g., '25) as being in the 21st century (e.g., 2025) and ensure the year is correctly identified. The parsing order for Hebrew dates should be day, then month, then year. Provide the final extracted date in YYYY-MM-DD format. If you cannot find a detail, return an empty string for that field. Give a brief description or gist of the barcode/QR code, but do not try to decode it."
+      text: "Analyze this event ticket image and extract the following details. The ticket might be in Hebrew. Pay close attention to dates. Interpret two-digit years (e.g., '25) as being in the 21st century (e.g., 2025) and ensure the year is correctly identified. The parsing order for Hebrew dates should be day, then month, then year. Provide the final extracted date in YYYY-MM-DD format. If you cannot find a detail, return an empty string for that field. Give a brief description or gist of the barcode/QR code. count the number of distinct barcodes or QR codes visible to estimate the number of tickets in the image (ticketCount)."
     };
     
     const response = await ai.models.generateContent({
@@ -46,6 +46,7 @@ export const extractTicketDetailsFromImage = async (
             location: { type: Type.STRING, description: "מיקום האירוע" },
             ticketType: { type: Type.STRING, description: "סוג הכרטיס (למשל, כניסה, VIP, אוכל)" },
             barcodeQRGist: { type: Type.STRING, description: "תיאור קצר של הברקוד או קוד ה-QR" },
+            ticketCount: { type: Type.INTEGER, description: "מספר הכרטיסים או הברקודים שזוהו בתמונה" },
           }
         }
       }
@@ -65,6 +66,11 @@ export const extractTicketDetailsFromImage = async (
         typeof parsedData.barcodeQRGist !== 'string'
     ) {
         throw new Error("Parsed JSON does not match expected schema.");
+    }
+    
+    // Ensure ticketCount is at least 1
+    if (!parsedData.ticketCount || parsedData.ticketCount < 1) {
+        parsedData.ticketCount = 1;
     }
     
     return parsedData as ExtractedTicketData;

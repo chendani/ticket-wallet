@@ -160,7 +160,14 @@ const AddTicketFlow: React.FC<AddTicketFlowProps> = ({ onBatchAdd, onCancel }) =
     if (!ticket || !ticket.formData) return;
 
     const updates: Partial<TicketProcessingState> = {};
-    const newFormData = { ...ticket.formData, [e.target.name]: e.target.value };
+    let newFormData = { ...ticket.formData };
+
+    if (e.target.name === 'ticketCount') {
+        newFormData.ticketCount = parseInt(e.target.value) || 1;
+    } else {
+        newFormData = { ...newFormData, [e.target.name]: e.target.value };
+    }
+    
     updates.formData = newFormData;
 
     if (e.target.name === 'date' && ticket.isDateInvalid) {
@@ -184,20 +191,30 @@ const AddTicketFlow: React.FC<AddTicketFlowProps> = ({ onBatchAdd, onCancel }) =
   const handleSaveAll = () => {
     const ticketsToSubmit = tickets.filter(t => t.status === 'review' && t.formData && t.imageBase64);
 
-    const payloads: NewTicketPayload[] = ticketsToSubmit.map(ticketState => {
-      const newTicket: Ticket = {
-        id: `tkt_${ticketState.id}`,
-        type: ticketState.formData!.ticketType,
-        qrCodeValue: ticketState.formData!.barcodeQRGist,
-        imageBase64: ticketState.imageBase64!,
-      };
-      const eventDetails: Omit<Event, 'id' | 'tickets' | 'reminder'> = {
-        name: ticketState.formData!.eventName,
-        date: ticketState.formData!.date,
-        time: ticketState.formData!.time,
-        location: ticketState.formData!.location,
-      };
-      return { ticket: newTicket, eventDetails };
+    const payloads: NewTicketPayload[] = ticketsToSubmit.flatMap(ticketState => {
+      const count = ticketState.formData!.ticketCount || 1;
+      const result: NewTicketPayload[] = [];
+      
+      for (let i = 0; i < count; i++) {
+        const newTicket: Ticket = {
+            id: `tkt_${ticketState.id}_${i}`,
+            type: ticketState.formData!.ticketType,
+            // If there are multiple tickets, we can't really differentiate the QR string automatically 
+            // unless the user edits it later, but we can give a hint.
+            qrCodeValue: count > 1 ? `${ticketState.formData!.barcodeQRGist} (${i + 1})` : ticketState.formData!.barcodeQRGist,
+            imageBase64: ticketState.imageBase64!,
+        };
+        
+        const eventDetails: Omit<Event, 'id' | 'tickets' | 'reminder'> = {
+            name: ticketState.formData!.eventName,
+            date: ticketState.formData!.date,
+            time: ticketState.formData!.time,
+            location: ticketState.formData!.location,
+        };
+        
+        result.push({ ticket: newTicket, eventDetails });
+      }
+      return result;
     });
 
     onBatchAdd(payloads);
@@ -296,18 +313,24 @@ const AddTicketFlow: React.FC<AddTicketFlowProps> = ({ onBatchAdd, onCancel }) =
                                         <label htmlFor={`location-${ticket.id}`} className="block text-sm font-medium text-gray-300 mb-1">מיקום (אופציונלי)</label>
                                         <input type="text" name="location" id={`location-${ticket.id}`} value={ticket.formData.location} onChange={(e) => handleFormChange(ticket.id, e)} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-purple-500 focus:border-purple-500" />
                                     </div>
-                                    <div>
-                                        <label htmlFor={`ticketType-${ticket.id}`} className="block text-sm font-medium text-gray-300 mb-1">סוג הכרטיס</label>
-                                        {ticket.showCustomTypeInput ? (
-                                             <input type="text" name="ticketType" id={`ticketType-${ticket.id}`} value={ticket.formData.ticketType} onChange={(e) => handleFormChange(ticket.id, e)} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-purple-500 focus:border-purple-500" required />
-                                        ) : (
-                                            <div className="flex flex-wrap gap-2">
-                                                {ticketTypeSuggestions.map(type => (
-                                                    <button type="button" key={type} onClick={() => { handleFormChange(ticket.id, { target: { name: 'ticketType', value: type } } as any); updateTicketState(ticket.id, {showCustomTypeInput: true}) }} className="bg-gray-600 hover:bg-purple-500 text-white py-2 px-4 rounded-lg transition-colors">{type}</button>
-                                                ))}
-                                                <button type="button" onClick={() => updateTicketState(ticket.id, {showCustomTypeInput: true})} className="bg-gray-600 hover:bg-gray-500 text-gray-300 py-2 px-4 rounded-lg transition-colors">אחר...</button>
-                                            </div>
-                                        )}
+                                    <div className="flex gap-4">
+                                        <div className="flex-1">
+                                            <label htmlFor={`ticketType-${ticket.id}`} className="block text-sm font-medium text-gray-300 mb-1">סוג הכרטיס</label>
+                                            {ticket.showCustomTypeInput ? (
+                                                 <input type="text" name="ticketType" id={`ticketType-${ticket.id}`} value={ticket.formData.ticketType} onChange={(e) => handleFormChange(ticket.id, e)} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-purple-500 focus:border-purple-500" required />
+                                            ) : (
+                                                <div className="flex flex-wrap gap-2">
+                                                    {ticketTypeSuggestions.map(type => (
+                                                        <button type="button" key={type} onClick={() => { handleFormChange(ticket.id, { target: { name: 'ticketType', value: type } } as any); updateTicketState(ticket.id, {showCustomTypeInput: true}) }} className="bg-gray-600 hover:bg-purple-500 text-white py-2 px-4 rounded-lg transition-colors text-sm">{type}</button>
+                                                    ))}
+                                                    <button type="button" onClick={() => updateTicketState(ticket.id, {showCustomTypeInput: true})} className="bg-gray-600 hover:bg-gray-500 text-gray-300 py-2 px-4 rounded-lg transition-colors text-sm">אחר...</button>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="w-1/3">
+                                            <label htmlFor={`ticketCount-${ticket.id}`} className="block text-sm font-medium text-gray-300 mb-1">מספר כרטיסים</label>
+                                            <input type="number" min="1" max="50" name="ticketCount" id={`ticketCount-${ticket.id}`} value={ticket.formData.ticketCount || 1} onChange={(e) => handleFormChange(ticket.id, e)} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:ring-purple-500 focus:border-purple-500 text-center" />
+                                        </div>
                                     </div>
                                     <div>
                                         <label htmlFor={`barcodeQRGist-${ticket.id}`} className="block text-sm font-medium text-gray-300 mb-1">ערך קוד QR / ברקוד</label>

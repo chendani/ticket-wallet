@@ -24,6 +24,7 @@ export interface ExtractedTicketData {
   location: string;
   ticketType: string;
   barcodeQRGist: string;
+  ticketCount?: number;
 }
 
 export interface NewTicketPayload {
